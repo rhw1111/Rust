@@ -2,9 +2,10 @@ extern crate lazy_static;
 extern crate fwlibrary;
 use std::ops::Deref;
 use std::ops::DerefMut;
+use std::sync::Arc;
 
 
-struct A{
+/*struct A{
     name:String
 }
 
@@ -108,7 +109,7 @@ fn vtest(v:& mut V)
 {
 
 }
-
+*/
 
 
 struct EntityAReal1IMP();
@@ -130,7 +131,7 @@ impl fwlibrary::EntityAIMP for EntityAReal1IMP
 fn main() {
 
 
-    /*unsafe{
+    unsafe{
     let x:Arc<dyn Fn()->Box<dyn fwlibrary::EntityAIMP>+Send+Sync>=Arc::new(||->Box<dyn fwlibrary::EntityAIMP>
         {
 
@@ -138,7 +139,7 @@ fn main() {
            
         });
         fwlibrary::ENTITYAIMPSTATICFACTORY = Some(x);
-    }*/
+    }
 
     let mut entitya=fwlibrary::EntityA::new();
 
