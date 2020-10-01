@@ -1,12 +1,8 @@
-#[macro_use]
 extern crate lazy_static; 
 extern crate fwlibrary;
 use std::ops::Deref;
 use std::ops::DerefMut;
-use std::default;
-use std::sync::Arc;
-use std::collections::HashMap;
-use std::sync::Once;
+
 
 struct A{
     name:String
@@ -113,132 +109,6 @@ fn vtest(v:& mut V)
 
 }
 
-static INIT: Once = Once::new();
-static mut EntityAIMPStaticFactory:Option<Arc<dyn Fn()->Box<dyn EntityAIMP>+Send+Sync>>=None;
-
-
-
-/*lazy_static! {
-    static ref EntityAIMPStaticFactory:HashMap<&'static str,Arc<dyn Fn()->Box<dyn EntityAIMP>+Send+Sync>> =
-    {
-
-        let mut map=HashMap::new();
-
-        let x:Arc<dyn Fn()->Box<dyn EntityAIMP>+Send+Sync>=Arc::new(||->Box<dyn EntityAIMP>
-            {
-    
-                Box::new(EntityARealIMP::new())
-               
-            });
-        map.insert("imp", x);
-
-        map
-    };
-    
-}*/
-
-
-struct EntityA<'a>{
-    base:fwlibrary::ModelBase<'a>,
-    imp:Box<dyn EntityAIMP>
-
-}
-
-
-trait EntityAIMP
-{
-    fn test(&self, entity:&EntityA)->&str;
-} 
-
-
-
-
-
-
-impl<'a> EntityA<'a>{
-    fn new()->EntityA<'a>{
-        
-        let realimp:Box<dyn EntityAIMP>;
-        unsafe {
-            INIT.call_once(|| {
-                let x:Arc<dyn Fn()->Box<dyn EntityAIMP>+Send+Sync>=Arc::new(||->Box<dyn EntityAIMP>
-                    {
-            
-                        Box::new(EntityARealIMP::new())
-                       
-                    });
-                EntityAIMPStaticFactory = Some(x);
-                
-            });
-
-
-            if let Some(v) = &EntityAIMPStaticFactory{
-                realimp=v();
-            }
-            else
-            {
-                realimp=Box::new(EntityARealIMP::new());
-            }
-
-        }
-
-        EntityA{
-            base:fwlibrary::ModelBase::new(),
-            imp:realimp
-        }
-    
-    }
-
-    fn getid(&self)->&str{
-        let value=self.base.getattribute::<String>("id");
-        let mut result:&str =Default::default();
-        if let Some(v) = value {
-            result=v;
-        } 
-        
-        result
-    }
-
-    fn setid(&mut self,value:String){
-        self.base.setattribute::<String>("id",value);
-    }
-
-    fn getremark(&self)->Option<&str>{
-        let value=self.base.getattribute::<Option<String>>("remark");
-        let mut result:Option<&str> = Option::None;
-        if let Some(v) = value {
-            if let Some(iv)=v{
-                result=Option::Some(iv);     
-            }
-            
-        } 
-
-        result
-    }
-
-    fn setremark(&mut self,value:Option<String>){
-        self.base.setattribute::<Option<String>>("remark",value);
-    }
-
-    fn test(&self)->&str{
-        self.imp.test(self)
-    }
-
-}
-
-struct EntityARealIMP();
-impl EntityARealIMP{
-    fn new()->EntityARealIMP
-    {
-        EntityARealIMP{}
-    }
-}
-impl EntityAIMP for EntityARealIMP 
-{
-    fn test(&self,entity:&EntityA)->&str{
-        "eeee"
-    }
-}
 
 
 struct EntityAReal1IMP();
@@ -248,9 +118,9 @@ impl EntityAReal1IMP{
         EntityAReal1IMP{}
     }
 }
-impl EntityAIMP for EntityAReal1IMP 
+impl fwlibrary::EntityAIMP for EntityAReal1IMP 
 {
-    fn test(&self,entity:&EntityA)->&str{
+    fn test(&self,entity:&fwlibrary::EntityA)->&str{
         "fffff"
     }
 }
@@ -260,16 +130,19 @@ impl EntityAIMP for EntityAReal1IMP
 fn main() {
 
 
+    /*unsafe{
+    let x:Arc<dyn Fn()->Box<dyn fwlibrary::EntityAIMP>+Send+Sync>=Arc::new(||->Box<dyn fwlibrary::EntityAIMP>
+        {
 
-    let mut ii: V=V{};
-    let  iia=&mut ii;
-    vtest(iia);
+            Box::new(EntityAReal1IMP::new())
+           
+        });
+        fwlibrary::ENTITYAIMPSTATICFACTORY = Some(x);
+    }*/
 
-    let ii1=ii;
-   
+    let mut entitya=fwlibrary::EntityA::new();
 
-    let mut entitya=EntityA::new();
-
+    let rentitya=&entitya;
     let ma=entitya.test();
 
     entitya.setid(String::from("11"));
@@ -279,6 +152,16 @@ fn main() {
     let aremark=entitya.getremark();
 
     let remark= aremark.unwrap();
+
+
+    /*let mut ii: V=V{};
+    let  iia=&mut ii;
+    vtest(iia);
+
+    let ii1=ii;
+   
+
+
 
 
     let mut e1=1;
@@ -297,5 +180,5 @@ fn main() {
  
     //a2(c);
     //let str1=c.a1();
-    println!("{}","");
+    println!("{}","");*/
 }
